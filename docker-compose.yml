@@ -1,0 +1,40 @@
+version: "3.8"
+
+services:
+
+  # TRAEFIK: 80 | 443 | 8080
+  # ----------------------------------------------------------------
+  traefik:
+    image: traefik:v2.8
+    container_name: "traefik"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8081:8080"
+    
+    # replace this for the current network:
+    # --providers.docker.network=torquay
+    # replace this for the certificate contact:
+    #--certificatesresolvers.myresolver.acme.email=el.coruco@gmail.com
+    command: 
+      --api.insecure=true 
+      --providers.docker
+      --providers.docker.network=torquay
+      --entryPoints.web.address=:80
+      --entrypoints.websecure.address=:443
+      --certificatesresolvers.myresolver.acme.tlschallenge=true
+      --certificatesresolvers.myresolver.acme.email=el.coruco@gmail.com
+      --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
+
+    volumes:
+      - "./letsencrypt:/letsencrypt"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    
+     # replace this for the current network:
+    networks:
+      - torquay
+
+networks:
+   # replace this for the current network:
+  torquay:
+    external: true
